@@ -1,0 +1,37 @@
+{
+	"name": "directus-extension-generate-pdf",
+	"description": "This package is a node for Directus flows, utilizing the PDFMake library for generating PDF documents.",
+	"icon": "extension",
+	"version": "1.0.0",
+	"keywords": [
+		"directus",
+		"directus-extension",
+		"directus-extension-operation",
+		"pdf-make"
+	],
+	"type": "module",
+	"files": [
+		"dist"
+	],
+	"directus:extension": {
+		"type": "operation",
+		"path": {
+			"app": "dist/app.js",
+			"api": "dist/api.js"
+		},
+		"source": {
+			"app": "src/app.js",
+			"api": "src/api.js"
+		},
+		"host": "^10.10.0"
+	},
+	"scripts": {
+		"build": "directus-extension build",
+		"dev": "directus-extension build -w --no-minify",
+		"link": "directus-extension link"
+	},
+	"devDependencies": {
+		"@directus/extensions-sdk": "11.0.9",
+		"vue": "^3.4.34"
+	}
+}
