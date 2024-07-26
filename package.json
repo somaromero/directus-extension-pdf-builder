@@ -30,6 +30,10 @@
 		"dev": "directus-extension build -w --no-minify",
 		"link": "directus-extension link"
 	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/HelloImZomi/directus-extension-generate-pdf.git"
+	},
 	"devDependencies": {
 		"@directus/extensions-sdk": "11.0.9",
 		"vue": "^3.4.34"
