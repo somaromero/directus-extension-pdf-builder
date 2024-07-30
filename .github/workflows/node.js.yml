@@ -29,3 +29,9 @@ jobs:
     - run: npm ci
     - run: npm run build --if-present
     # - run: npm test
+
+    # Check if there are changes in the src/ directory
+    - name: Check for changes in the src/ directory
+      run: |
+        git diff --exit-code src/
+        echo "::set-output name=changes::$(git diff --exit-code src/; echo $?)"
