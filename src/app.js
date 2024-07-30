@@ -1,12 +1,16 @@
 export default {
-	id: 'custom',
-	name: 'Custom',
-	icon: 'box',
-	description: 'This is my custom operation!',
-	overview: ({ text }) => [
+	id: 'operation-generate-pdf',
+	name: 'Generate PDF',
+	icon: 'picture_as_pdf',
+	description: 'Generate a pdf with flow data and the template.',
+	overview: ({ collection, url }) => [
 		{
-			label: 'Text',
-			text: text,
+			label: '$t:collection',
+			text: collection,
+		},
+		{
+			label: 'Url',
+			text: url,
 		},
 	],
 	options: [
