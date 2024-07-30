@@ -1,5 +1,5 @@
 export default {
-	id: 'custom',
+	id: 'operation-pdf-generator',
 	handler: ({ text }) => {
 		console.log(text);
 	},

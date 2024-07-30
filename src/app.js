@@ -1,5 +1,5 @@
 export default {
-	id: 'operation-generate-pdf',
+	id: 'operation-pdf-generator',
 	name: 'Generate PDF',
 	icon: 'picture_as_pdf',
 	description: 'Generate a pdf with flow data and the template.',
