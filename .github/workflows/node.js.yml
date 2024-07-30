@@ -35,15 +35,3 @@ jobs:
       run: |
         git diff --exit-code src/
         echo "changes=$(git diff --exit-code src/; echo $?)" >> $GITHUB_ENV
-
-    # Push changes in the /dist directory if there are changes in the src/ directory
-    - name: Push changes in the /dist directory
-      if: steps.check_changes.outputs.changes == '0'
-      run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git add dist/
-        git commit -m "Add built files from GitHub Actions [skip ci]"
-        git push
-      env:
-        GITHUB_TOKEN: ${{ secrets.DIRECTUS_REPO_TOKEN }}
