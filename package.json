@@ -37,5 +37,8 @@
 	"devDependencies": {
 		"@directus/extensions-sdk": "11.0.9",
 		"vue": "^3.4.34"
+	},
+	"dependencies": {
+		"pdfmake": "^0.2.10"
 	}
 }
