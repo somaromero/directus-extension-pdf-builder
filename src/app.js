@@ -90,16 +90,59 @@ export default {
             type: 'json',
             meta: {
                 width: 'full',
-                interface: 'input-code',
+                interface: 'list',
+                special: 'cast-json',
                 options: {
-                    lineWrapping: true,
-                    language: 'JSON',
-                    template: JSON.stringify({
-                        "FontName-Regular.ttf": "",
-                        "FontName-Italic.ttf": "",
-                        "FontName-Bold.ttf": "",
-                        "FontName-BoldItalic.ttf": "",
-                    }),
+                    template: '{{ fontFamily }} - {{fontType}}',
+                    fields: [
+                        {
+                            field: 'font_family',
+                            name: 'Font Family',
+                            type: 'string',
+                            meta: {
+                                width: 'full',
+                                interface: 'input',
+                                required: true,
+                                options: {
+                                    placeholder: 'Roboto',
+                                    iconRight: 'type_specimen',
+                                }
+                            }
+                        },
+                        {
+                            field: 'font_type',
+                            name: 'Font Type',
+                            type: 'string',
+                            meta: {
+                                width: 'full',
+                                interface: 'select-dropdown',
+                                required: true,
+                                options: {
+                                    allowOther: true,
+                                    choices: [
+                                        {text: 'Regular', value: 'Regular'},
+                                        {text: 'Bold', value: 'Bold'},
+                                        {text: 'Italic', value: 'Italic'},
+                                        {text: 'BoldItalic', value: 'BoldItalic'},
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            field: 'url',
+                            name: 'Url',
+                            type: 'string',
+                            meta: {
+                                width: 'full',
+                                interface: 'input',
+                                required: true,
+                                options: {
+                                    placeholder: 'https://example.com/fonts/font.ttf',
+                                    iconRight: 'link',
+                                }
+                            }
+                        },
+                    ]
                 }
             }
         }
