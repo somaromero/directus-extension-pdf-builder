@@ -93,7 +93,7 @@ export default {
                 interface: 'list',
                 special: 'cast-json',
                 options: {
-                    template: '{{ fontFamily }} - {{fontType}}',
+                    template: '{{ font_family }} - {{ font_type }}',
                     fields: [
                         {
                             field: 'font_family',
