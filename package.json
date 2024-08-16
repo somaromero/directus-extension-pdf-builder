@@ -39,6 +39,8 @@
 		"vue": "^3.4.34"
 	},
 	"dependencies": {
-		"pdfmake": "^0.2.10"
+		"axios": "^1.7.4",
+		"pdfmake": "^0.2.10",
+		"uuid": "^10.0.0"
 	}
 }
