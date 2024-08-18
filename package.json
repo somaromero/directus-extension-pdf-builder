@@ -1,5 +1,5 @@
 {
-	"name": "directus-extension-pdf-generator",
+	"name": "directus-extension-pdf-builder",
 	"description": "This package is a node for Directus flows, utilizing the PDFMake library for generating PDF documents.",
 	"icon": "extension",
 	"version": "1.0.0",
@@ -32,7 +32,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/HelloImZomi/directus-extension-generate-pdf.git"
+		"url": "git+https://github.com/HelloImZomi/directus-extension-pdf-builder.git"
 	},
 	"devDependencies": {
 		"@directus/extensions-sdk": "11.0.9",
