@@ -34,9 +34,6 @@
 		"type": "git",
 		"url": "git+https://github.com/somaromero/directus-extension-pdf-builder.git"
 	},
-	"publishConfig": {
-		"registry": "https://npm.pkg.github.com/"
-	},
 	"devDependencies": {
 		"@directus/extensions-sdk": "11.0.9",
 		"vue": "^3.4.34"
