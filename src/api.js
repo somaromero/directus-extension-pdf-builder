@@ -3,9 +3,10 @@ import {Readable} from 'stream';
 import axios from 'axios';
 import {Buffer} from 'buffer';
 import {validate as uuidValidate} from 'uuid';
+import * as pdfFonts from './vfs_fonts.js';
 
 export default {
-    id: 'operation-pdf-generator',
+    id: 'operation-pdf-builder',
     handler: async ({filename, folder, storage, template, fonts}, {services, database, accountability, getSchema}) => {
         const {FilesService, AssetsService} = services;
         const schema = await getSchema({database});
@@ -22,6 +23,9 @@ export default {
         try {
             pdfMake.vfs = await getBase64Fonts(fonts, assetsService);
             pdfMake.fonts = await getPdfMakeFonts(fonts);
+
+            console.log('VFS:', pdfMake.vfs);
+            console.log('Fonts:', pdfMake.fonts);
 
             const pdfDocGenerator = pdfMake.createPdf(template);
 
@@ -71,7 +75,8 @@ export default {
 
 function bufferToReadable(buffer) {
     const readable = new Readable();
-    readable._read = () => {};
+    readable._read = () => {
+    };
     readable.push(buffer);
     readable.push(null);
     return readable;
@@ -101,7 +106,7 @@ async function fetchExternalFont(url) {
     });
 }
 
-async function fetchInternalFont(uuid, assetsService)  {
+async function fetchInternalFont(uuid, assetsService) {
     return assetsService.getAsset(uuid)
         .then(async (fileStream) => {
             const {stream} = fileStream;
@@ -116,18 +121,23 @@ async function fetchInternalFont(uuid, assetsService)  {
 
 async function getBase64Fonts(fonts, assetsService) {
     const base64Fonts = [];
+    // Load the default pdfMake fonts
+    for (const [font, base64] of Object.entries(pdfFonts.vfs)) {
+        base64Fonts[font] = base64;
+    }
+    if (Array.isArray(fonts)) {
+        for (const font of fonts) {
+            try {
+                const {font_family, font_type, url} = font;
 
-    for (const font of fonts) {
-        try {
-            const {font_family, font_type, url} = font;
-
-            if (uuidValidate(url)) {
-                base64Fonts[`${font_family}-${font_type}.ttf`] = await fetchInternalFont(url, assetsService);
-            } else {
-                base64Fonts[`${font_family}-${font_type}.ttf`] = await fetchExternalFont(url);
+                if (uuidValidate(url)) {
+                    base64Fonts[`${font_family}-${font_type}.ttf`] = await fetchInternalFont(url, assetsService);
+                } else if (url) {
+                    base64Fonts[`${font_family}-${font_type}.ttf`] = await fetchExternalFont(url);
+                }
+            } catch (error) {
+                console.error('Error fetching font:', error);
             }
-        } catch (error) {
-            console.error('Error fetching font:', error);
         }
     }
 
@@ -135,21 +145,32 @@ async function getBase64Fonts(fonts, assetsService) {
 }
 
 async function getPdfMakeFonts(fonts) {
-    let pdfFonts = {};
+    let fontList = {};
 
     return await new Promise((resolve, reject) => {
         try {
-            for (const font of fonts) {
-                const {font_family} = font;
-                pdfFonts[font_family] = {
-                    normal: `${font_family}-Regular.ttf`,
-                    bold: `${font_family}-Bold.ttf`,
-                    italics: `${font_family}-Italic.ttf`,
-                    bolditalics: `${font_family}-BoldItalic.ttf`
+            if (Array.isArray(fonts)) {
+                for (const font of fonts) {
+                    const {font_family} = font;
+                    fontList[font_family] = {
+                        normal: `${font_family}-Regular.ttf`,
+                        bold: `${font_family}-Bold.ttf`,
+                        italics: `${font_family}-Italic.ttf`,
+                        bolditalics: `${font_family}-BoldItalic.ttf`
+                    };
+                }
+            } else {
+                fontList = {
+                    Roboto: {
+                        normal: 'Roboto-Regular.ttf',
+                        bold: 'Roboto-Bold.ttf',
+                        italics: 'Roboto-Italic.ttf',
+                        bolditalics: 'Roboto-BoldItalic.ttf'
+                    }
                 };
             }
 
-            resolve(pdfFonts);
+            resolve(fontList);
         } catch (e) {
             console.error(e);
             reject(false);
