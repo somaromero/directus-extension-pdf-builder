@@ -2,7 +2,7 @@
 	"name": "directus-extension-pdf-builder",
 	"description": "This package is a node for Directus flows, utilizing the PDFMake library for generating PDF documents.",
 	"icon": "extension",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"keywords": [
 		"directus",
 		"directus-extension",
