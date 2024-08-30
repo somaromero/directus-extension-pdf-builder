@@ -1,6 +1,5 @@
 import pdfMake from 'pdfmake/build/pdfmake';
 import {Readable} from 'stream';
-import axios from 'axios';
 import {Buffer} from 'buffer';
 import {validate as uuidValidate} from 'uuid';
 import * as pdfFonts from './vfs_fonts.js';
@@ -22,7 +21,7 @@ export default {
 
         try {
             pdfMake.vfs = await getBase64Fonts(fonts, assetsService);
-            pdfMake.fonts = await getPdfMakeFonts(fonts);
+            pdfMake.fonts = getPdfMakeFonts(fonts);
 
             console.log('VFS:', pdfMake.vfs);
             console.log('Fonts:', pdfMake.fonts);
@@ -93,16 +92,11 @@ async function streamToBuffer(stream) {
 }
 
 async function fetchExternalFont(url) {
-    return new Promise((resolve, reject) => {
-        axios.get(url, {
-            responseType: 'arraybuffer'
-        }).then((response) => {
-            const base64 = Buffer.from(response.data, 'binary').toString('base64');
-            resolve(base64);
-        }).catch((error) => {
-            console.error('Error fetching external font:', error);
-            reject(false);
-        });
+    return await fetch(url, {headers: {responseType: 'arraybuffer'}}).then((response) => {
+        return Buffer.from(response.data, 'binary').toString('base64');
+    }).catch((error) => {
+        console.error('Error fetching external font:', error);
+        return false;
     });
 }
 
@@ -144,36 +138,33 @@ async function getBase64Fonts(fonts, assetsService) {
     return base64Fonts;
 }
 
-async function getPdfMakeFonts(fonts) {
+function getPdfMakeFonts(fonts) {
     let fontList = {};
 
-    return await new Promise((resolve, reject) => {
-        try {
-            if (Array.isArray(fonts)) {
-                for (const font of fonts) {
-                    const {font_family} = font;
-                    fontList[font_family] = {
-                        normal: `${font_family}-Regular.ttf`,
-                        bold: `${font_family}-Bold.ttf`,
-                        italics: `${font_family}-Italic.ttf`,
-                        bolditalics: `${font_family}-BoldItalic.ttf`
-                    };
-                }
-            } else {
-                fontList = {
-                    Roboto: {
-                        normal: 'Roboto-Regular.ttf',
-                        bold: 'Roboto-Bold.ttf',
-                        italics: 'Roboto-Italic.ttf',
-                        bolditalics: 'Roboto-BoldItalic.ttf'
-                    }
+    try {
+        if (Array.isArray(fonts)) {
+            for (const font of fonts) {
+                const {font_family} = font;
+                fontList[font_family] = {
+                    normal: `${font_family}-Regular.ttf`,
+                    bold: `${font_family}-Bold.ttf`,
+                    italics: `${font_family}-Italic.ttf`,
+                    bolditalics: `${font_family}-BoldItalic.ttf`
                 };
             }
-
-            resolve(fontList);
-        } catch (e) {
-            console.error(e);
-            reject(false);
+        } else {
+            fontList = {
+                Roboto: {
+                    normal: 'Roboto-Regular.ttf',
+                    bold: 'Roboto-Bold.ttf',
+                    italics: 'Roboto-Italic.ttf',
+                    bolditalics: 'Roboto-BoldItalic.ttf'
+                }
+            };
         }
-    });
+        return fontList;
+    }catch (e) {
+        console.error(e);
+        return false;
+    }
 }
