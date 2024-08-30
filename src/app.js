@@ -1,6 +1,6 @@
 export default {
     id: 'operation-pdf-builder',
-    name: 'PDF Builder',
+    name: 'PDF Builder Operation',
     icon: 'picture_as_pdf',
     description: 'Generate a pdf with flow data and the template.',
     overview: ({filename}) => [
