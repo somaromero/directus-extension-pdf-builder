@@ -3,10 +3,14 @@ export default {
     name: 'PDF Builder Operation',
     icon: 'picture_as_pdf',
     description: 'Generate a pdf with flow data and the template.',
-    overview: ({filename}) => [
+    overview: ({filename, fonts}) => [
         {
             label: 'Filename',
             text: filename,
+        },
+        {
+            label: 'Fonts',
+            text: getFontList(fonts),
         }
     ],
     options: [
@@ -41,7 +45,7 @@ export default {
         },
         {
             field: 'filename',
-            name: 'Filename',
+            name: '$t:fields.directus_files.filename_download',
             type: 'string',
             meta: {
                 width: 'full',
@@ -50,7 +54,7 @@ export default {
         },
         {
             field: 'folder',
-            name: 'Folder',
+            name: '$t:folder',
             type: 'uuid',
             meta: {
                 width: 'half',
@@ -59,7 +63,7 @@ export default {
         },
         {
             field: 'storage',
-            name: 'Storage',
+            name: '$t:fields.directus_files.storage',
             type: 'string',
             meta: {
                 width: 'half',
@@ -72,7 +76,7 @@ export default {
         },
         {
             field: 'template',
-            name: 'Template',
+            name: '$t:template',
             type: 'json',
             meta: {
                 width: 'full',
@@ -145,6 +149,66 @@ export default {
                     ]
                 }
             }
+        },
+        {
+            field: 'images',
+            name: 'Images',
+            type: 'json',
+            meta: {
+                width: 'full',
+                interface: 'list',
+                special: 'cast-json',
+                options: {
+                    template: '{{ image_name }}',
+                    fields: [
+                        {
+                            field: 'image_name',
+                            name: 'Name',
+                            type: 'string',
+                            meta: {
+                                width: 'full',
+                                interface: 'input',
+                                required: true,
+                                options: {
+                                    placeholder: 'image',
+                                    iconRight: 'image',
+                                }
+                            }
+                        },
+                        {
+                            field: 'url',
+                            name: 'Url',
+                            type: 'string',
+                            meta: {
+                                width: 'full',
+                                interface: 'input',
+                                required: true,
+                                options: {
+                                    placeholder: 'https://example.com/image.jpg',
+                                    iconRight: 'link',
+                                }
+                            }
+                        },
+                    ]
+                }
+            }
         }
     ],
 };
+
+function getFontList(fonts) {
+    if (!Array.isArray(fonts)) {
+        return '$t:no_items';
+    } else {
+        const uniqueFonts = fonts.reduce((acc, current) => {
+            const font = acc.find(item => item.font_family === current.font_family);
+            if (!font) {
+                return acc.concat([current]);
+            } else {
+                return acc;
+            }
+        }, []);
+
+        return uniqueFonts.map(font => `${font.font_family} - ${font.font_type}`).join(uniqueFonts.length > 1 ? ', ' : '');
+    }
+}

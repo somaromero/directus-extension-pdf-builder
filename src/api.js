@@ -6,7 +6,12 @@ import * as pdfFonts from './vfs_fonts.js';
 
 export default {
     id: 'operation-pdf-builder',
-    handler: async ({filename, folder, storage, template, fonts}, {services, database, accountability, getSchema}) => {
+    handler: async ({filename, folder, storage, template, fonts, images}, {
+        services,
+        database,
+        accountability,
+        getSchema
+    }) => {
         const {FilesService, AssetsService} = services;
         const schema = await getSchema({database});
         const filesService = new FilesService({
@@ -23,8 +28,7 @@ export default {
             pdfMake.vfs = await getBase64Fonts(fonts, assetsService);
             pdfMake.fonts = getPdfMakeFonts(fonts);
 
-            console.log('VFS:', pdfMake.vfs);
-            console.log('Fonts:', pdfMake.fonts);
+            template['images'] = await addImages(images, assetsService, filesService);
 
             const pdfDocGenerator = pdfMake.createPdf(template);
 
@@ -92,12 +96,40 @@ async function streamToBuffer(stream) {
 }
 
 async function fetchExternalFont(url) {
-    return await fetch(url, {headers: {responseType: 'arraybuffer'}}).then((response) => {
-        return Buffer.from(response.data, 'binary').toString('base64');
-    }).catch((error) => {
+    try {
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            console.error(`HTTP error! status: ${response.status}`);
+            return false;
+        }
+
+        const arrayBuffer = await response.arrayBuffer();
+        return Buffer.from(arrayBuffer).toString('base64');
+    } catch (error) {
         console.error('Error fetching external font:', error);
         return false;
-    });
+    }
+}
+
+async function fetchExternalImage(url) {
+    try {
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            console.error(`HTTP error! status: ${response.status}`);
+            return false;
+        }
+
+        const contentType = response.headers.get('content-type');
+        const arrayBuffer = await response.arrayBuffer();
+        const base64Image = Buffer.from(arrayBuffer).toString('base64');
+
+        return `data:${contentType};base64,${base64Image}`;
+    } catch (error) {
+        console.error('Error fetching external image:', error);
+        return false;
+    }
 }
 
 async function fetchInternalFont(uuid, assetsService) {
@@ -109,6 +141,22 @@ async function fetchInternalFont(uuid, assetsService) {
         })
         .catch((error) => {
             console.error('Error fetching internal font:', error);
+            return false;
+        });
+}
+
+async function fetchInternalImage(uuid, assetsService, filesService) {
+    return assetsService.getAsset(uuid)
+        .then(async (fileStream) => {
+            const {stream} = fileStream;
+            const {type} = await filesService.readOne(uuid);
+            const buffer = await streamToBuffer(stream);
+            const base64Image = Buffer.from(buffer).toString('base64');
+
+            return `data:${type};base64,${base64Image}`;
+        })
+        .catch((error) => {
+            console.error('Error fetching internal image:', error);
             return false;
         });
 }
@@ -163,8 +211,25 @@ function getPdfMakeFonts(fonts) {
             };
         }
         return fontList;
-    }catch (e) {
+    } catch (e) {
         console.error(e);
         return false;
     }
+}
+
+async function addImages(images, assetsService, filesService) {
+    let imageList = {};
+
+    if (Array.isArray(images)) {
+        for (const image of images) {
+            const {image_name, url} = image;
+            if (uuidValidate(url)) {
+                imageList[image_name] = await fetchInternalImage(url, assetsService, filesService);
+            } else if (url) {
+                imageList[image_name] = await fetchExternalImage(url, assetsService);
+            }
+        }
+    }
+
+    return imageList;
 }
