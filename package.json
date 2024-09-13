@@ -24,7 +24,7 @@
 			"app": "src/app.js",
 			"api": "src/api.js"
 		},
-		"host": "^10.13.2"
+		"host": "^11.1.0"
 	},
 	"scripts": {
 		"build": "directus-extension build",

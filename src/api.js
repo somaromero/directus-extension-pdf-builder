@@ -28,9 +28,10 @@ export default {
             pdfMake.vfs = await getBase64Fonts(fonts, assetsService);
             pdfMake.fonts = getPdfMakeFonts(fonts);
 
-            template['images'] = await addImages(images, assetsService, filesService);
+            const pdfDoc = convertStringToStructure(template);
+            pdfDoc['images'] = await addImages(images, assetsService, filesService);
 
-            const pdfDocGenerator = pdfMake.createPdf(template);
+            const pdfDocGenerator = pdfMake.createPdf(pdfDoc);
 
             const buffer = await new Promise((resolve, reject) => {
                 pdfDocGenerator.getBuffer((buffer) => {
@@ -232,4 +233,29 @@ async function addImages(images, assetsService, filesService) {
     }
 
     return imageList;
+}
+
+function convertStringToStructure(template) {
+    const regexArray = /^\[(.*?)]$/;
+    const regexObject = /^\{(.*?)}$/;
+
+    if (typeof template === 'string' && regexArray.test(template)) {
+        return JSON.parse(template);
+    }
+
+    if (typeof template === 'string' && regexObject.test(template)) {
+        return JSON.parse(template);
+    }
+
+    if (Array.isArray(template)) {
+        return template.map(item => convertStringToStructure(item));
+    }
+
+    if (typeof template === 'object' && template !== null) {
+        for (let key in template) {
+            template[key] = convertStringToStructure(template[key]);
+        }
+    }
+
+    return template;
 }
