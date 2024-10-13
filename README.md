@@ -29,17 +29,3 @@ This view shows the general configuration form for the PDF Builder operation, wh
 permissions, filename, storage, and the JSON template that will be used to generate the PDF.
 
 ![Operation General Form View](https://raw.githubusercontent.com/somaromero/directus-extension-pdf-builder/main/screenshots/operation_general_form_view.png)
-
-### Font URL Configuration
-
-In this view, you can configure an external font by providing the URL. Ensure that the URL points to a TTF font file, as
-only TTF fonts are supported.
-
-![Operation Font URL Form](https://raw.githubusercontent.com/somaromero/directus-extension-pdf-builder/main/screenshots/operation_font_url_form.png)
-
-### Font UUID Configuration
-
-This view allows you to select an internal font stored in Directus by using its UUID. The font must be of TTF type, and
-the UUID is obtained from the file's URL within Directus.
-
-![Operation Font UUID Form](https://raw.githubusercontent.com/somaromero/directus-extension-pdf-builder/main/screenshots/operation_font_uuid_form.png)
